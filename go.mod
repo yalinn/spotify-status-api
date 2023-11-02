@@ -1,4 +1,4 @@
-module spotify-status-api-golang
+module github.com/tantoony/spotify-status-api-golang
 
 go 1.20
 
