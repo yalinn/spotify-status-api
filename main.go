@@ -52,10 +52,6 @@ func main() {
 			fmt.Println(secretKey)
 		}
 		fmt.Println(secretKey)
-		/* if  !secretKey !=  return reply.send({ error: "BAD_REQUEST" })
-		   let userDoc = await profiles.findOne({ accessKey: secretKey });
-		   if (!userDoc) userDoc = await profiles.create({ accessKey: secretKey });
-		   request.doc = userDoc; */
 		return c.Next()
 	})
 	router_auth.Post("/spotify", func(c *fiber.Ctx) error {
