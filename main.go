@@ -42,7 +42,6 @@ var (
 )
 
 func main() {
-	//fn.GetOs()
 	router_auth := app.Group("/auth")
 	router_auth.Use(func(c *fiber.Ctx) error {
 		secretKey := c.GetReqHeaders()["Authorization"]
