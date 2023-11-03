@@ -1,43 +1,19 @@
 package main
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/tantoony/spotify-status-api-golang/config"
+	"github.com/tantoony/spotify-status-api-golang/database"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/redis/go-redis/v9"
 )
 
-type RedisInstance struct {
-	Client *redis.Client
-	ctx    context.Context
-}
-
-// Source https://go.dev/tour/methods/1
-func (db RedisInstance) get(key string) (string, error) {
-	val, err := db.Client.Get(db.ctx, key).Result()
-	return val, err
-}
-func (db RedisInstance) del(keys ...string) error {
-	err := db.Client.Del(db.ctx, keys...).Err()
-	return err
-}
-func (db RedisInstance) set(key string, value interface{}) error {
-	err := db.Client.Set(db.ctx, key, value, 0).Err()
-	return err
-}
-
 var (
-	Mongo *mongo.Database
-	Redis RedisInstance
-	app   *fiber.App
+	app *fiber.App
 )
 
 func main() {
@@ -76,43 +52,16 @@ func main() {
 
 func init() {
 	config.InitializeEnv()
-	if err := MongoConnection(config.MONGO_URI, config.MONGO_DBNAME); err != nil {
+	if err := database.MongoConnection(config.MONGO_URI, config.MONGO_DBNAME); err != nil {
 		log.Fatalf("Error connecting to MongoDB")
 	} else {
 		fmt.Println("MongoDB successfully connected...")
 	}
-	if err := RedisConnection(config.REDIS_URI); err != nil {
+	if err := database.RedisConnection(config.REDIS_URI); err != nil {
 		log.Fatalf("Error connecting to Redis")
 	} else {
 		fmt.Println("Redis successfully connected...")
 	}
 	app = fiber.New()
 	app.Use(cors.New())
-}
-
-func MongoConnection(mongoURI string, dbName string) error {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURI))
-	if err != nil {
-		return err
-	}
-	Mongo = client.Database(dbName)
-	return nil
-}
-
-// Source: https://redis.io/docs/clients/go/
-func RedisConnection(redisURI string) error {
-	opt, err := redis.ParseURL(redisURI)
-
-	if err != nil {
-		panic(err)
-	}
-
-	client := redis.NewClient(opt)
-	ctx := context.Background()
-
-	Redis = RedisInstance{
-		Client: client,
-		ctx:    ctx,
-	}
-	return nil
 }
