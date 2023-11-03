@@ -14,8 +14,8 @@ func FetchSpotifyToken(code string) error {
 		"grant_type":    {"authorization_code"},
 		"code":          {code},
 		"redirect_uri":  {"http://localhost:3333/auth/spotify"},
-		"client_id":     {"c0d0f0b0c0d0f0b0c0d0f0b0c0d0f0b0"},
-		"client_secret": {"c0d0f0b0c0d0f0b0c0d0f0b0c0d0f0b0"},
+		"client_id":     {config.SPOTIFY_CLIENT_ID},
+		"client_secret": {config.SPOTIFY_CLIENT_SECRET},
 	}.Encode()
 	var jsonData = []byte(jsonBody)
 	request, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", bytes.NewBuffer(jsonData))
@@ -30,8 +30,8 @@ func bufferToBase64(buf *bytes.Buffer) string {
 
 func client_token() string {
 	var strBuffer bytes.Buffer
-	strBuffer.WriteString(config.CLIENT_ID)
+	strBuffer.WriteString(config.SPOTIFY_CLIENT_ID)
 	strBuffer.WriteString(":")
-	strBuffer.WriteString(config.CLIENT_SECRET)
+	strBuffer.WriteString(config.SPOTIFY_CLIENT_SECRET)
 	return bufferToBase64(&strBuffer)
 }
