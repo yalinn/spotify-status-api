@@ -3,16 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/tantoony/spotify-status-api-golang/config"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -62,6 +61,7 @@ func main() {
 		fmt.Println("Spotify middleware")
 		return c.Next()
 	})
+
 	router_spotify.Get("/:id", func(c *fiber.Ctx) error {
 		return c.SendString("[GET]/spotify/:id")
 	})
@@ -75,17 +75,13 @@ func main() {
 }
 
 func init() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading .env file")
-	} else {
-		fmt.Println("Environment variables successfully loaded...")
-	}
-	if err := MongoConnection(os.Getenv("MONGO_URI"), os.Getenv("MONGO_DBNAME")); err != nil {
+	config.InitializeEnv()
+	if err := MongoConnection(config.MONGO_URI, config.MONGO_DBNAME); err != nil {
 		log.Fatalf("Error connecting to MongoDB")
 	} else {
 		fmt.Println("MongoDB successfully connected...")
 	}
-	if err := RedisConnection(os.Getenv("REDIS_URI")); err != nil {
+	if err := RedisConnection(config.REDIS_URI); err != nil {
 		log.Fatalf("Error connecting to Redis")
 	} else {
 		fmt.Println("Redis successfully connected...")

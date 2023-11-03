@@ -3,13 +3,13 @@ package functions
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"net/url"
-	"os"
+
+	"github.com/tantoony/spotify-status-api-golang/config"
 )
 
-func fetchToken(code string) error {
+func FetchSpotifyToken(code string) error {
 	jsonBody := url.Values{
 		"grant_type":    {"authorization_code"},
 		"code":          {code},
@@ -30,16 +30,8 @@ func bufferToBase64(buf *bytes.Buffer) string {
 
 func client_token() string {
 	var strBuffer bytes.Buffer
-	strBuffer.WriteString(os.Getenv("SPOTIFY_CLIENT_ID"))
+	strBuffer.WriteString(config.CLIENT_ID)
 	strBuffer.WriteString(":")
-	strBuffer.WriteString(os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	strBuffer.WriteString(config.CLIENT_SECRET)
 	return bufferToBase64(&strBuffer)
 }
-
-func getOs() error {
-	osy := os.Getenv("CLIENT_ID")
-	fmt.Println(osy)
-	return nil
-}
-
-var asd = getOs()
