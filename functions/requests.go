@@ -29,17 +29,6 @@ type UserResponse struct {
 }
 
 func AuthorizeSpotify(code string) string {
-	/* reqBody, err := json.Marshal(map[string]string{
-		"grant_type":    "authorization_code",
-		"code":          code,
-		"redirect_uri":  "http://127.0.0.1:3000/api/spotify",
-		"client_id":     config.SPOTIFY_CLIENT_ID,
-		"client_secret": config.SPOTIFY_CLIENT_SECRET,
-	})
-	if err != nil {
-		log.Fatalf("failed to marshal body: %s", err)
-	} */
-	//request, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", bytes.NewBuffer(reqBody))
 	reqBody := url.Values{}
 	reqBody.Set("grant_type", "authorization_code")
 	reqBody.Set("code", code)
