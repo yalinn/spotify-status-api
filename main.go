@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/tantoony/spotify-status-api-golang/config"
@@ -22,11 +23,14 @@ func main() {
 	router_auth := app.Group("/auth")
 	router_auth.Use(func(c *fiber.Ctx) error {
 		secretKey := c.GetReqHeaders()["Authorization"]
-		if len(secretKey) == 0 || secretKey[0] == "" {
+		if len(secretKey) == 0 {
 			return c.SendString("No secret key provided")
 		}
+		if secretKey[0] == "" {
+			return c.SendString("Invalid secret key")
+		}
 		authorization_token := secretKey[0]
-		fmt.Println("token: " + authorization_token)
+		c.Locals("authorization_token", authorization_token)
 		return c.Next()
 	})
 	router_auth.Post("/spotify", func(c *fiber.Ctx) error {
@@ -51,18 +55,34 @@ func main() {
 
 	router_spotify := app.Group("/spotify")
 	router_spotify.Use(func(c *fiber.Ctx) error {
-		fmt.Println("Spotify middleware")
+		secretKey := c.GetReqHeaders()["Authorization"]
+		if len(secretKey) == 0 {
+			return c.SendString("No secret key provided")
+		}
+		if secretKey[0] == "" {
+			return c.SendString("Invalid secret key")
+		}
+		authorization_token := secretKey[0]
+		c.Locals("token", authorization_token)
+		return c.Next()
+	})
+	router_spotify.Use("/:id", func(c *fiber.Ctx) error {
+		c.Locals("date", time.Now().String())
+		param := c.Params("id")
+		fmt.Println(param)
+		docId, _ := database.Redis.Get("spotify:" + param)
+		fmt.Println(docId)
 		return c.Next()
 	})
 
+	router_spotify.Get("/", func(c *fiber.Ctx) error {
+		s := c.Locals("token").(string)
+		return c.SendString(s)
+	})
+
 	router_spotify.Get("/:id", func(c *fiber.Ctx) error {
-		var j interface{}
-		asd := functions.FetchSpotifyUser("BQANOM9e0-nuLkRmClMoZaqvE6KP8HRLjZcNov9fOEfIaAseOPhv5U4F1TQ89sxU16tN-cBWxbarlCd6n2Xh4fnexz_nRJZR4az8rG4_J5zYPhzu4bcTzJuflizG2vqYvuwjq0CD1OgG2TcsfLClxUDkwZmC4ZBI6V1G9rSCKkda9JUw1wwUPHqVLYoAba46DU1D1z3HzHO_tinDFp1cnX7Ug6I")
-		err := json.Unmarshal([]byte(asd), &j)
-		if err != nil {
-			fmt.Println(err)
-		}
-		return c.JSON(j)
+		id := c.Params("id")
+		return c.SendString(id)
 	})
 
 	if err := app.Listen(":5000"); err != nil {
