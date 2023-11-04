@@ -8,7 +8,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var Mongo *mongo.Database
+var (
+	Mongo    *mongo.Database
+	Profiles *mongo.Collection
+	Auths    *mongo.Collection
+)
 
 func MongoConnection(mongoURI string, dbName string) error {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURI))
@@ -16,6 +20,8 @@ func MongoConnection(mongoURI string, dbName string) error {
 		return err
 	}
 	Mongo = client.Database(dbName)
+	Profiles = Mongo.Collection("app.profiles")
+	Auths = Mongo.Collection("app.auths")
 	return nil
 }
 

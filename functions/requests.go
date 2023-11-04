@@ -83,3 +83,27 @@ func responseString(request *http.Request) string {
 	}
 	return ""
 }
+
+func UserPlaying(access_token string) string {
+	request, err := http.NewRequest("GET", "https://api.spotify.com/v1/me/player", nil)
+	if err != nil {
+		fmt.Print(err)
+		return ""
+	}
+	auth_type_input := "Bearer " + access_token
+	request.Header.Set("Authorization", auth_type_input)
+	response := responseString(request)
+	return response
+}
+
+func UserQueue(access_token string) string {
+	request, err := http.NewRequest("GET", "https://api.spotify.com/v1/me/player/queue", nil)
+	if err != nil {
+		fmt.Print(err)
+		return ""
+	}
+	auth_type_input := "Bearer " + access_token
+	request.Header.Set("Authorization", auth_type_input)
+	response := responseString(request)
+	return response
+}
