@@ -109,3 +109,21 @@ func UserQueue(access_token string) string {
 	response := responseString(request)
 	return response
 }
+
+func RefreshToken(refresh_token string) string {
+	reqBody := url.Values{}
+	reqBody.Set("grant_type", "refresh_token")
+	reqBody.Set("refresh_token", Cryptit(refresh_token, true))
+	reqBody.Add("redirect_uri", "http://127.0.0.1:3000/api/spotify")
+	encodedData := reqBody.Encode()
+	request, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", strings.NewReader(encodedData))
+	if err != nil {
+		fmt.Print(err)
+		return ""
+	}
+	auth_type_input := "Basic " + client_token()
+	request.Header.Set("Authorization", auth_type_input)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response := responseString(request)
+	return response
+}

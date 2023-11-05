@@ -58,13 +58,11 @@ func CreateAuthDocument(refID string, platform int, token string) error {
 	if _, err := database.Auths.InsertOne(context.TODO(), bson.D{
 		{Key: "ref", Value: ref_id},
 		{Key: "platform", Value: platform},
-		{Key: "token", Value: crypted},
+		{Key: "context", Value: crypted},
 	}); err != nil {
 		fmt.Println(err)
 		return err
 	}
-	database.Redis.Set("key_spotify:"+refID, crypted)
-	database.Redis.Expire("key_spotify:"+refID, 3600*time.Second)
 	return nil
 }
 
@@ -96,5 +94,19 @@ func FindUserDocumentByID(c *fiber.Ctx, ID string) (database.UserDocument, error
 		result = *document
 	}
 	database.Redis.Set("spotify:"+ID, result.ID)
+	return result, err
+}
+
+func FindAuthDocumentByRefID(refID string, platform int) (database.AuthDocument, error) {
+	ref_id, _ := primitive.ObjectIDFromHex(refID)
+	query := bson.D{
+		{Key: "ref", Value: ref_id},
+		{Key: "platform", Value: platform},
+	}
+	var result database.AuthDocument
+	err := database.Auths.FindOne(context.Background(), query).Decode(&result)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return result, err
 }

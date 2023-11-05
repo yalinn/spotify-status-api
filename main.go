@@ -63,6 +63,8 @@ func main() {
 			fmt.Println("error create auth document")
 			fmt.Println(err)
 		}
+		database.Redis.Set("key_spotify:"+document.ID, functions.Cryptit(access_token, false))
+		database.Redis.Expire("key_spotify:"+document.ID, 3600*time.Second)
 		return nil
 	})
 
@@ -83,8 +85,22 @@ func main() {
 		c.Locals("date", time.Now().String())
 		param := c.Params("id")
 		fmt.Println(param)
-		docId, _ := database.Redis.Get("spotify:" + param)
-		fmt.Println(docId)
+		var docId string
+		if _id, err := database.Redis.Get("spotify:" + param); err != nil {
+			doc, _ := functions.FindUserDocumentByID(c, param)
+			docId = doc.ID
+		} else {
+			docId = _id
+		}
+		var token string
+		if key, err := database.Redis.Get("key_spotify:" + docId); err != nil {
+			fmt.Println("Refreshing token...")
+			auth, _ := functions.FindAuthDocumentByRefID(docId, 1)
+			token = functions.RefreshToken(auth.Context)
+		} else {
+			token = key
+		}
+		c.Locals("token", token)
 		return c.Next()
 	})
 
