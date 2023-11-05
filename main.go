@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/tantoony/spotify-status-api-golang/config"
-	"github.com/tantoony/spotify-status-api-golang/database"
-	"github.com/tantoony/spotify-status-api-golang/functions"
+	"github.com/tantoony/spotify-status-api/config"
+	"github.com/tantoony/spotify-status-api/database"
+	"github.com/tantoony/spotify-status-api/functions"
 
 	"github.com/gofiber/fiber/v2"
 

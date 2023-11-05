@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/tantoony/spotify-status-api-golang/config"
+	"github.com/tantoony/spotify-status-api/config"
 )
 
 func AuthorizeSpotify(code string) string {
