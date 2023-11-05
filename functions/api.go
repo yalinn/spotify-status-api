@@ -18,6 +18,44 @@ type UserResponse struct {
 	User UserMetaResponse `json:"user"`
 }
 
+type SpotifyResponse struct {
+	IsActive     bool   `json:"is_active"`
+	Type         string `json:"type"`
+	ShuffleState bool   `json:"shuffle_state"`
+	RepeatState  string `json:"repeat_state"`
+	IsPlaying    bool   `json:"is_playing"`
+	TimeStamp    int    `json:"timestamp"`
+	Song         string `json:"song"`
+	Progress     struct {
+		From string `json:"from"`
+		To   string `json:"to"`
+	} `json:"progress"`
+	Artists    []Artist     `json:"artists"`
+	ProgressMs int          `json:"progress_ms"`
+	DurationMs int          `json:"duration_ms"`
+	Image      Image        `json:"image"`
+	Url        string       `json:"url"`
+	ReqTime    string       `json:"reqTime"`
+	Queue      []QueuedSong `json:"queue"`
+}
+
+type QueuedSong struct {
+	Name    string `json:"name"`
+	Artists string `json:"artists"`
+	Image   Image  `json:"image"`
+}
+
+type Image struct {
+	Url    string `json:"url"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
+}
+
+type Artist struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
+}
+
 type UserPlayingResponse struct {
 	Device struct {
 		ID               string `json:"id"`
