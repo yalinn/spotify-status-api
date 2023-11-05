@@ -12,24 +12,6 @@ import (
 	"github.com/tantoony/spotify-status-api-golang/config"
 )
 
-type AuthorizationResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
-	Scope       string `json:"scope"`
-	Error       string `json:"error"`
-}
-
-type UserMetaResponse struct {
-	ID    string `json:"id"`
-	Name  string `json:"display_name"`
-	Error string `json:"error"`
-}
-
-type UserResponse struct {
-	User UserMetaResponse `json:"user"`
-}
-
 func AuthorizeSpotify(code string) string {
 	reqBody := url.Values{}
 	reqBody.Set("grant_type", "authorization_code")
