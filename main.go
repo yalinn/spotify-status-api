@@ -98,7 +98,7 @@ func main() {
 			auth, _ := functions.FindAuthDocumentByRefID(docId, 1)
 			token = functions.RefreshToken(auth.Context)
 		} else {
-			token = key
+			token = functions.Cryptit(key, true)
 		}
 		c.Locals("token", token)
 		return c.Next()
