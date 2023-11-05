@@ -17,11 +17,13 @@ type AuthorizationResponse struct {
 	TokenType   string `json:"token_type"`
 	ExpiresIn   int    `json:"expires_in"`
 	Scope       string `json:"scope"`
+	Error       string `json:"error"`
 }
 
 type UserMetaResponse struct {
-	ID   string `json:"id"`
-	Name string `json:"display_name"`
+	ID    string `json:"id"`
+	Name  string `json:"display_name"`
+	Error string `json:"error"`
 }
 
 type UserResponse struct {

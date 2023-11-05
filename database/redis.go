@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -24,6 +25,10 @@ func (db RedisInstance) Del(keys ...string) error {
 }
 func (db RedisInstance) Set(key string, value interface{}) error {
 	err := db.Client.Set(db.ctx, key, value, 0).Err()
+	return err
+}
+func (db RedisInstance) Expire(key string, expiration time.Duration) error {
+	err := db.Client.Expire(db.ctx, key, expiration).Err()
 	return err
 }
 
