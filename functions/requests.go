@@ -16,7 +16,7 @@ func AuthorizeSpotify(code string) string {
 	reqBody := url.Values{}
 	reqBody.Set("grant_type", "authorization_code")
 	reqBody.Set("code", code)
-	reqBody.Add("redirect_uri", "http://127.0.0.1:3000/api/spotify")
+	reqBody.Add("redirect_uri", config.REDIRECT_URI)
 	reqBody.Add("client_id", config.SPOTIFY_CLIENT_ID)
 	reqBody.Add("client_secret", config.SPOTIFY_CLIENT_SECRET)
 	encodedData := reqBody.Encode()
@@ -96,7 +96,7 @@ func RefreshToken(refresh_token string) string {
 	reqBody := url.Values{}
 	reqBody.Set("grant_type", "refresh_token")
 	reqBody.Set("refresh_token", Cryptit(refresh_token, true))
-	reqBody.Add("redirect_uri", "http://127.0.0.1:3000/api/spotify")
+	reqBody.Add("redirect_uri", config.REDIRECT_URI)
 	encodedData := reqBody.Encode()
 	request, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", strings.NewReader(encodedData))
 	if err != nil {

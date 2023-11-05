@@ -13,6 +13,7 @@ var (
 	MONGO_URI             string
 	MONGO_DBNAME          string
 	REDIS_URI             string
+	REDIRECT_URI          string
 )
 
 func InitializeEnv() {
@@ -24,4 +25,5 @@ func InitializeEnv() {
 	MONGO_URI = os.Getenv("MONGO_URI")
 	MONGO_DBNAME = os.Getenv("MONGO_DBNAME")
 	REDIS_URI = os.Getenv("REDIS_URI")
+	REDIRECT_URI = os.Getenv("REDIRECT_URI")
 }
