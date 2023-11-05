@@ -24,7 +24,7 @@ type SpotifyResponse struct {
 	ShuffleState bool   `json:"shuffle_state"`
 	RepeatState  string `json:"repeat_state"`
 	IsPlaying    bool   `json:"is_playing"`
-	TimeStamp    int    `json:"timestamp"`
+	TimeStamp    int64  `json:"timestamp"`
 	Song         string `json:"song"`
 	Progress     struct {
 		From string `json:"from"`

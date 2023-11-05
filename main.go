@@ -84,7 +84,6 @@ func main() {
 	router_spotify.Use("/:id", func(c *fiber.Ctx) error {
 		c.Locals("date", time.Now().String())
 		param := c.Params("id")
-		fmt.Println(param)
 		var docId string
 		if _id, err := database.Redis.Get("spotify:" + param); err != nil {
 			doc, _ := functions.FindUserDocumentByID(c, param)
@@ -93,7 +92,7 @@ func main() {
 			docId = _id
 		}
 		var token string
-		if key, err := database.Redis.Get("key_spotify:" + docId); err != nil {
+		if key, err := database.Redis.Get("key_spotify:" + docId); err != nil || len(key) == 0 {
 			fmt.Println("Refreshing token...")
 			auth, _ := functions.FindAuthDocumentByRefID(docId, 1)
 			token = functions.RefreshToken(auth.Context)
@@ -110,8 +109,64 @@ func main() {
 	})
 
 	router_spotify.Get("/:id", func(c *fiber.Ctx) error {
-		id := c.Params("id")
-		return c.SendString(id)
+		//id := c.Params("id")
+		now_playing_response := functions.UserPlaying(c.Locals("token").(string))
+		if len(now_playing_response) == 0 {
+			fmt.Println("asd")
+			return c.SendString("No song playing")
+		}
+		var now_playing functions.UserPlayingResponse
+		if err := json.Unmarshal([]byte(now_playing_response), &now_playing); err != nil {
+			fmt.Println("error unmarshal now_playing response")
+			fmt.Println(err)
+		}
+		queue_response := functions.UserQueue(c.Locals("token").(string))
+		var queue functions.UserPlayerQueueResponse
+		if len(queue_response) == 0 {
+			return c.SendString("No song in queue")
+		}
+		if err := json.Unmarshal([]byte(queue_response), &queue); err != nil {
+			fmt.Println("error unmarshal queue response")
+			fmt.Println(err)
+		}
+		var response = new(functions.SpotifyResponse)
+		response.IsActive = now_playing.IsPlaying
+		response.Type = now_playing.Device.Type
+		response.ShuffleState = now_playing.ShuffleState
+		response.RepeatState = now_playing.RepeatState
+		response.IsPlaying = now_playing.IsPlaying
+		response.TimeStamp = time.Now().UnixMilli()
+		response.Song = now_playing.Item.Name
+		response.Progress.From = GTS(now_playing.ProgressMs)
+		response.Progress.To = GTS(now_playing.Item.DurationMs)
+		response.Artists = make([]functions.Artist, 0)
+		for _, artist := range now_playing.Item.Artists {
+			response.Artists = append(response.Artists, functions.Artist{
+				Name: artist.Name,
+				Url:  artist.ExternalURLs.Spotify,
+			})
+		}
+		response.ProgressMs = now_playing.ProgressMs
+		response.DurationMs = now_playing.Item.DurationMs
+		response.Image.Url = now_playing.Item.Album.Images[0].URL
+		response.Image.Height = now_playing.Item.Album.Images[0].Height
+		response.Image.Width = now_playing.Item.Album.Images[0].Width
+		response.Url = now_playing.Item.ExternalURLs.Spotify
+		response.ReqTime = c.Locals("date").(string)
+		response.Queue = make([]functions.QueuedSong, 0)
+		for _, item := range queue.Queue {
+			response.Queue = append(response.Queue, functions.QueuedSong{
+				Name:    item.Name,
+				Artists: item.Artists[0].Name,
+				Image: functions.Image{
+					Url:    item.Album.Images[0].URL,
+					Height: item.Album.Images[0].Height,
+					Width:  item.Album.Images[0].Width,
+				},
+			})
+		}
+		//response.Queue = response.Queue[1:]
+		return c.JSON(response)
 	})
 
 	if err := app.Listen(":5000"); err != nil {
@@ -136,4 +191,17 @@ func init() {
 	}
 	app = fiber.New()
 	app.Use(cors.New())
+}
+
+func GTS(ms int) string {
+	seconds := ms / 1000
+	minutes := seconds / 60
+	seconds = seconds % 60
+	var str string
+	if seconds < 10 {
+		str = "0"
+	} else {
+		str = ""
+	}
+	return fmt.Sprintf("%d:%s%d", minutes, str, seconds)
 }
