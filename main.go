@@ -169,7 +169,7 @@ func main() {
 		return c.JSON(response)
 	})
 
-	if err := app.Listen(":5000"); err != nil {
+	if err := app.Listen(config.PORT); err != nil {
 		log.Info("Oops... Server is not running! Reason: %v", err)
 	} else {
 		log.Info("Server is running on port 3000...")

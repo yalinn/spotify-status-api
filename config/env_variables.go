@@ -14,6 +14,7 @@ var (
 	MONGO_DBNAME          string
 	REDIS_URI             string
 	REDIRECT_URI          string
+	PORT                  string = "5871"
 )
 
 func InitializeEnv() {
