@@ -69,7 +69,7 @@ func main() {
 	})
 
 	router_spotify := app.Group("/spotify")
-	router_spotify.Use(func(c *fiber.Ctx) error {
+	/* router_spotify.Use(func(c *fiber.Ctx) error {
 		secretKey := c.GetReqHeaders()["Authorization"]
 		if len(secretKey) == 0 {
 			return c.SendString("No secret key provided")
@@ -80,7 +80,7 @@ func main() {
 		authorization_token := secretKey[0]
 		c.Locals("token", authorization_token)
 		return c.Next()
-	})
+	}) */
 	router_spotify.Use("/:id", func(c *fiber.Ctx) error {
 		c.Locals("date", time.Now().String())
 		param := c.Params("id")
