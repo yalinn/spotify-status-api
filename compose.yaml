@@ -1,0 +1,5 @@
+services:
+  spotify-api:
+    build: "."
+    restart: always
+    network_mode: "host"
