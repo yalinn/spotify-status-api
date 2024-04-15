@@ -23,8 +23,8 @@ func AuthorizeSpotify(code string) string {
 	request, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", strings.NewReader(encodedData))
 
 	if err != nil {
-		fmt.Print(err)
-		return ""
+		log.Info(err.Error())
+		return err.Error()
 	}
 	auth_type_input := "Basic " + client_token()
 	request.Header.Set("Authorization", auth_type_input)
@@ -53,19 +53,16 @@ func responseString(request *http.Request) string {
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err.Error())
 		return ""
 	}
 	defer response.Body.Close()
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		bodyString := string(bodyBytes)
-		return bodyString
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
 	}
-	return ""
+	return string(body)
 }
 
 func UserPlaying(access_token string) string {

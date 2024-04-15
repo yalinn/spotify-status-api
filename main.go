@@ -45,10 +45,13 @@ func main() {
 		}
 		access_token := authformat.AccessToken
 		user := functions.FetchSpotifyUser(access_token)
-		var userformat functions.UserResponse
-		if err := json.Unmarshal([]byte("{\"user\":"+user+"}"), &userformat); err != nil {
+		var usermeta functions.UserMetaResponse
+		if err := json.Unmarshal([]byte(user), &usermeta); err != nil {
 			fmt.Println("error unmarshal usermeta response")
 			fmt.Println(err)
+		}
+		userformat := functions.UserResponse{
+			User: usermeta,
 		}
 		if len(userformat.User.Error) > 0 {
 			return c.SendString(userformat.User.Error)
@@ -84,6 +87,9 @@ func main() {
 	router_spotify.Use("/:id", func(c *fiber.Ctx) error {
 		c.Locals("date", time.Now().String())
 		param := c.Params("id")
+		if len(param) == 0 {
+			return c.SendString("No id provided")
+		}
 		var docId string
 		if _id, err := database.Redis.Get("spotify:" + param); err != nil {
 			doc, _ := functions.FindUserDocumentByID(c, param)
@@ -104,15 +110,21 @@ func main() {
 	})
 
 	router_spotify.Get("/", func(c *fiber.Ctx) error {
-		s := c.Locals("token").(string)
-		return c.SendString(s)
+		s := c.Locals("token")
+		if s == nil {
+			return c.SendString("No id provided")
+		} else {
+			s := s.(string)
+			return c.SendString(s)
+		}
 	})
 
 	router_spotify.Get("/:id", func(c *fiber.Ctx) error {
-		//id := c.Params("id")
+		if c.Locals("token") == nil {
+			return c.SendString("No token provided")
+		}
 		now_playing_response := functions.UserPlaying(c.Locals("token").(string))
 		if len(now_playing_response) == 0 {
-			fmt.Println("asd")
 			return c.SendString("No song playing")
 		}
 		var now_playing functions.UserPlayingResponse
